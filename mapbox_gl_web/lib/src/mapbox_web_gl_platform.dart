@@ -108,9 +108,21 @@ class MapboxWebGlPlatform extends MapboxGlPlatform
     if (_dragEnabled) {
       _map.on('mouseup', _onMouseUp);
       _map.on('mousemove', _onMouseMove);
+      for (final layerId in _interactiveFeatureLayerIds) {
+        _map.on('mouseenter', layerId, _onMouseEnterFeature);
+        _map.on('mousemouve', layerId, _onMouseEnterFeature);
+        _map.on('mouseleave', layerId, _onMouseLeaveFeature);
+        _map.on('mousedown', layerId, _onMouseDown);
+      }
     } else {
       _map.off('mouseup', _onMouseUp);
       _map.off('mousemove', _onMouseMove);
+      for (final layerId in _interactiveFeatureLayerIds) {
+        _map.off('mouseenter', layerId, _onMouseEnterFeature);
+        _map.off('mousemouve', layerId, _onMouseEnterFeature);
+        _map.off('mouseleave', layerId, _onMouseLeaveFeature);
+        _map.off('mousedown', layerId, _onMouseDown);
+      }
     }
   }
 
