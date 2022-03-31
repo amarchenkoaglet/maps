@@ -25,12 +25,15 @@ class MapboxWebGlPlatform extends MapboxGlPlatform
   String? _navigationControlPosition;
   NavigationControl? _navigationControl;
 
+  bool _initialized = false;
+
   @override
   Widget buildView(
       Map<String, dynamic> creationParams,
       OnPlatformViewCreatedCallback onPlatformViewCreated,
       Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers) {
     _creationParams = creationParams;
+    _updateDrag();
     _registerViewFactory(onPlatformViewCreated, this.hashCode);
     return HtmlElementView(
         viewType: 'plugins.flutter.io/mapbox_gl_${this.hashCode}');
@@ -90,6 +93,25 @@ class MapboxWebGlPlatform extends MapboxGlPlatform
       }
     }
     Convert.interpretMapboxMapOptions(_creationParams['options'], this);
+    _initialized = true;
+  }
+
+  void _updateDrag() {
+    if (!_initialized) return;
+
+    final bool _oldDragEnabled = _dragEnabled;
+    _dragEnabled = _creationParams['dragEnabled'] ?? true;
+
+    print('BUBILD DRAG: $_oldDragEnabled $_dragEnabled');
+    if (_oldDragEnabled == _dragEnabled) return;
+
+    if (_dragEnabled) {
+      _map.on('mouseup', _onMouseUp);
+      _map.on('mousemove', _onMouseMove);
+    } else {
+      _map.off('mouseup', _onMouseUp);
+      _map.off('mousemove', _onMouseMove);
+    }
   }
 
   void _loadFromAssets(Event event) async {
